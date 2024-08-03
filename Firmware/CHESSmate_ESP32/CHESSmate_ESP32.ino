@@ -24,6 +24,34 @@
 #define CKINT   14    // Read timer interrupt
 #define CLKTI   15    // DIV by 1024 enable interrupts
 
+#if defined(RASPBERRYPI_PICO) || defined(ARDUINO_RASPBERRY_PI_PICO)
+// IO pins used on the arduino.
+#define PA0 7
+#define PA1 6
+#define PA2 5
+#define PA3 4
+#define PA4 3
+#define PA5 2
+#define PA6 1
+#define PA7 0
+
+#define ENTER_KEY     8
+#define CLEAR_KEY     9
+#define NEW_GAME_KEY  10
+
+#define CHECK_LED     11
+#define LOSES_LED     12
+#define WHITE_LED     13
+#define BLACK_LED     20
+
+#define DISPLAY_1     14
+#define DISPLAY_2     15
+#define DISPLAY_3     16
+#define DISPLAY_4     17
+
+#define BUZZER_1      18
+#define BUZZER_2      19
+#else
 // IO pins used on the arduino.
 #define PA0 13
 #define PA1 12
@@ -49,6 +77,7 @@
 
 #define BUZZER_1      2
 #define BUZZER_2      15
+#endif
 
 // Millisecond value for 1 minute.
 #define PART_MINUTE   250   // 1/240th of a minute in millseconds.
@@ -87,7 +116,12 @@ void setup () {
 
   pinMode(CHECK_LED, OUTPUT);
   pinMode(LOSES_LED, OUTPUT);
+#if defined(RASPBERRYPI_PICO) || defined(ARDUINO_RASPBERRY_PI_PICO)
+  pinMode(BLACK_LED, OUTPUT);
+  pinMode(WHITE_LED, OUTPUT);
+#else
   pinMode(B_W_LED, OUTPUT);
+#endif
 
   pinMode(DISPLAY_1, OUTPUT);
   pinMode(DISPLAY_2, OUTPUT);
@@ -172,6 +206,7 @@ extern "C" {
       // Current value of the timer countdown?
       return 0x00;
     } 
+    return 0x00;
   }
 
   // Handle writes to RRIOT registers.
@@ -295,12 +330,23 @@ extern "C" {
       } else {
           digitalWrite(CHECK_LED, LOW);
       }
+      
       // Check for BLACK or WHITE.
+#if defined(RASPBERRYPI_PICO) || defined(ARDUINO_RASPBERRY_PI_PICO)
+      if ((value & 0b00010000) > 0) {
+        digitalWrite(BLACK_LED, LOW);
+        digitalWrite(WHITE_LED, HIGH);
+      } else {
+        digitalWrite(BLACK_LED, HIGH);
+        digitalWrite(WHITE_LED, LOW);
+      }
+#else
       if ((value & 0b00010000) > 0) {
         digitalWrite(B_W_LED, LOW);
       } else {
         digitalWrite(B_W_LED, HIGH);
       }
+#endif
     } else if (address == PBDD) {            // Port B Data Direction
       // PB0 - PB7 Data Direction Register (PBDD)
       // Does not directly map to specific pins. Will always be output. 0x7F
