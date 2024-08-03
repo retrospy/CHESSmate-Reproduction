@@ -68,7 +68,8 @@
 
 #define CHECK_LED     19
 #define LOSES_LED     18
-#define B_W_LED       5
+#define WHITE_LED     5
+#define BLACK_LED     9
 
 #define DISPLAY_1     17
 #define DISPLAY_2     16
@@ -120,7 +121,8 @@ void setup () {
   pinMode(BLACK_LED, OUTPUT);
   pinMode(WHITE_LED, OUTPUT);
 #else
-  pinMode(B_W_LED, OUTPUT);
+  pinMode(WHITE_LED, OUTPUT);
+  pinMode(BLACK_LED, OUTPUT);
 #endif
 
   pinMode(DISPLAY_1, OUTPUT);
@@ -332,7 +334,6 @@ extern "C" {
       }
       
       // Check for BLACK or WHITE.
-#if defined(RASPBERRYPI_PICO) || defined(ARDUINO_RASPBERRY_PI_PICO)
       if ((value & 0b00010000) > 0) {
         digitalWrite(BLACK_LED, LOW);
         digitalWrite(WHITE_LED, HIGH);
@@ -340,13 +341,6 @@ extern "C" {
         digitalWrite(BLACK_LED, HIGH);
         digitalWrite(WHITE_LED, LOW);
       }
-#else
-      if ((value & 0b00010000) > 0) {
-        digitalWrite(B_W_LED, LOW);
-      } else {
-        digitalWrite(B_W_LED, HIGH);
-      }
-#endif
     } else if (address == PBDD) {            // Port B Data Direction
       // PB0 - PB7 Data Direction Register (PBDD)
       // Does not directly map to specific pins. Will always be output. 0x7F
