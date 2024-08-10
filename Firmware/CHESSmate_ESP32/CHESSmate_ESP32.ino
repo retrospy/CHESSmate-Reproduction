@@ -104,9 +104,13 @@ extern "C" {
 
 void setup () {
   Serial.begin (115200);
+#if defined(RASPBERRYPI_PICO) || defined(ARDUINO_RASPBERRY_PI_PICO)
+  delay(1000);
+#else
   while (!Serial) {
     ; // wait for serial port to connect. Needed for native USB
   }
+#endif
   delay(100);
   Serial.println ("CHESSmate Starting");
   
@@ -117,13 +121,9 @@ void setup () {
 
   pinMode(CHECK_LED, OUTPUT);
   pinMode(LOSES_LED, OUTPUT);
-#if defined(RASPBERRYPI_PICO) || defined(ARDUINO_RASPBERRY_PI_PICO)
+
   pinMode(BLACK_LED, OUTPUT);
   pinMode(WHITE_LED, OUTPUT);
-#else
-  pinMode(WHITE_LED, OUTPUT);
-  pinMode(BLACK_LED, OUTPUT);
-#endif
 
   pinMode(DISPLAY_1, OUTPUT);
   pinMode(DISPLAY_2, OUTPUT);
